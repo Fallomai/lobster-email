@@ -4,13 +4,18 @@
   "description": "Email for AI Agents",
   "type": "module",
   "scripts": {
-    "dev": "wrangler dev",
+    "dev": "bun run --cwd web dev",
+    "dev:api": "wrangler dev",
+    "dev:all": "concurrently \"npm run dev:api\" \"npm run dev\"",
+    "build": "bun run --cwd web build",
     "deploy": "wrangler deploy",
-    "db:migrate": "wrangler d1 execute lobster-email-db --file=./schema.sql",
+    "deploy:api": "wrangler deploy",
+    "db:migrate": "wrangler d1 execute lobster-email-db --remote --file=./schema.sql",
     "db:migrate:local": "wrangler d1 execute lobster-email-db --local --file=./schema.sql"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20260130.0",
+    "concurrently": "^9.2.1",
     "typescript": "^5.9.3",
     "wrangler": "^4.61.1"
   },
