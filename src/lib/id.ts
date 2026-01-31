@@ -5,7 +5,7 @@ export function generateApiKey(): string {
 }
 
 export function generateInboxId(name?: string): string {
-  const suffix = nanoid(4).toLowerCase();
+  const suffix = nanoid(8).toLowerCase();
   if (name) {
     // Sanitize name: lowercase, alphanumeric and hyphens only
     const sanitized = name
@@ -16,7 +16,7 @@ export function generateInboxId(name?: string): string {
       .slice(0, 20);
     return `${sanitized}-${suffix}`;
   }
-  return `inbox-${nanoid(6).toLowerCase()}`;
+  return `inbox-${nanoid(10).toLowerCase()}`;
 }
 
 export function generateMessageId(): string {

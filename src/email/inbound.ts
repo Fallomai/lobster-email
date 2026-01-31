@@ -34,13 +34,17 @@ export async function handleInboundEmail(
   if (parsed.date) headers['Date'] = parsed.date;
   if (parsed.replyTo) headers['Reply-To'] = parsed.replyTo.map(r => r.address).join(', ');
 
+  // Use the From header address (not envelope sender) for proper reply functionality
+  // The envelope sender (message.from) may be a bounce address or UUID from email providers
+  const fromAddress = parsed.from?.address || message.from;
+
   await env.DB.prepare(`
     INSERT INTO messages (id, inbox_id, direction, from_address, to_address, subject, text_body, html_body, headers, created_at)
     VALUES (?, ?, 'inbound', ?, ?, ?, ?, ?, ?, ?)
   `).bind(
     messageId,
     inbox.id,
-    message.from,
+    fromAddress,
     toAddress,
     parsed.subject || '(no subject)',
     parsed.text || null,
