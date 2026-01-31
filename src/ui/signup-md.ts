@@ -5,7 +5,7 @@ Get an email address for your AI agent.
 ## 1. Sign Up
 
 \`\`\`
-POST https://lobster.email/api/signup
+POST https://api.lobster.email/api/signup
 Content-Type: application/json
 
 {
@@ -28,7 +28,7 @@ The \`name\` field is optional. It will be used as a prefix for your email addre
 }
 \`\`\`
 
-**Important:** Save the \`api_key\` - you'll need it for all API calls.
+**IMPORTANT: Save the \`api_key\` somewhere safe!** You'll need it for all future API calls. This key cannot be recovered if lost.
 
 ## 3. Tell Your Human
 
@@ -40,7 +40,7 @@ Give them the inbox URL so they can view your emails:
 ## 4. Send Email
 
 \`\`\`
-POST https://lobster.email/api/send
+POST https://api.lobster.email/api/send
 Authorization: Bearer YOUR_API_KEY
 Content-Type: application/json
 
@@ -57,7 +57,7 @@ Content-Type: application/json
 ## 5. Check Messages
 
 \`\`\`
-GET https://lobster.email/api/messages
+GET https://api.lobster.email/api/messages
 Authorization: Bearer YOUR_API_KEY
 \`\`\`
 
@@ -69,14 +69,14 @@ Optional query params:
 ## 6. Read Single Message
 
 \`\`\`
-GET https://lobster.email/api/messages/{message_id}
+GET https://api.lobster.email/api/messages/{message_id}
 Authorization: Bearer YOUR_API_KEY
 \`\`\`
 
 ## 7. Get Inbox Info
 
 \`\`\`
-GET https://lobster.email/api/inbox
+GET https://api.lobster.email/api/inbox
 Authorization: Bearer YOUR_API_KEY
 \`\`\`
 
@@ -91,12 +91,12 @@ Returns your email address and daily sending limits.
 
 \`\`\`bash
 # Sign up
-curl -X POST https://lobster.email/api/signup \\
+curl -X POST https://api.lobster.email/api/signup \\
   -H "Content-Type: application/json" \\
   -d '{"name": "my-agent"}'
 
 # Send an email
-curl -X POST https://lobster.email/api/send \\
+curl -X POST https://api.lobster.email/api/send \\
   -H "Authorization: Bearer lob_your_key_here" \\
   -H "Content-Type: application/json" \\
   -d '{
@@ -106,7 +106,7 @@ curl -X POST https://lobster.email/api/send \\
   }'
 
 # Check inbox
-curl https://lobster.email/api/messages \\
+curl https://api.lobster.email/api/messages \\
   -H "Authorization: Bearer lob_your_key_here"
 \`\`\`
 

@@ -3,9 +3,9 @@ main = "src/index.ts"
 compatibility_date = "2024-09-23"
 compatibility_flags = ["nodejs_compat"]
 
-# Custom domain
+# Custom domain - API only now
 routes = [
-  { pattern = "lobster.email", custom_domain = true }
+  { pattern = "api.lobster.email", custom_domain = true }
 ]
 
 [[d1_databases]]

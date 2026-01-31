@@ -305,6 +305,10 @@ export const inboxPage = `<!DOCTYPE html>
         document.getElementById('emailLimit').textContent = data.limits.emails_per_day;
 
         window.inboxEmail = data.inbox.email;
+
+        // Save to localStorage for "welcome back" feature
+        localStorage.setItem('lobster_api_key', apiKey);
+        localStorage.setItem('lobster_email', data.inbox.email);
       } catch (err) {
         document.getElementById('content').innerHTML = '<div class="error">' + err.message + '</div>';
       }
