@@ -8,6 +8,7 @@ import signupApi from './api/signup';
 import inboxApi from './api/inbox';
 import messagesApi from './api/messages';
 import sendApi from './api/send';
+import statsApi from './api/stats';
 
 // Signup instructions (still served from API for agents)
 import { signupMd } from './ui/signup-md';
@@ -27,6 +28,7 @@ app.route('/api/signup', signupApi);
 app.route('/api/inbox', inboxApi);
 app.route('/api/messages', messagesApi);
 app.route('/api/send', sendApi);
+app.route('/api/stats', statsApi);
 
 // Health check
 app.get('/api/health', (c) => {

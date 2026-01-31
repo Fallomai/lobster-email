@@ -2,6 +2,7 @@ export interface Env {
   DB: D1Database;
   RESEND_API_KEY: string;
   DOMAIN: string;
+  ADMIN_SECRET: string;
 }
 
 export interface ApiKey {
