@@ -1,0 +1,23 @@
+{
+  "name": "lobster-email",
+  "version": "1.0.0",
+  "description": "Email for AI Agents",
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "db:migrate": "wrangler d1 execute lobster-email-db --file=./schema.sql",
+    "db:migrate:local": "wrangler d1 execute lobster-email-db --local --file=./schema.sql"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20260130.0",
+    "typescript": "^5.9.3",
+    "wrangler": "^4.61.1"
+  },
+  "dependencies": {
+    "hono": "^4.11.7",
+    "nanoid": "^5.1.6",
+    "postal-mime": "^2.7.3",
+    "resend": "^6.9.1"
+  }
+}

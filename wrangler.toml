@@ -1,0 +1,14 @@
+name = "lobster-email"
+main = "src/index.ts"
+compatibility_date = "2024-09-23"
+compatibility_flags = ["nodejs_compat"]
+
+[[d1_databases]]
+binding = "DB"
+database_name = "lobster-email-db"
+database_id = "8388e406-e388-487b-ac72-1cee2886a21e"
+
+[vars]
+DOMAIN = "lobster.email"
+
+# RESEND_API_KEY set via `wrangler secret put RESEND_API_KEY`
