@@ -13,6 +13,7 @@ interface SendBody {
   subject: string;
   text: string;
   html?: string;
+  reply_to_message_id?: string;
 }
 
 app.post('/', async (c) => {
@@ -42,6 +43,22 @@ app.post('/', async (c) => {
     }, 429);
   }
 
+  // If replying, fetch original message to get headers
+  let replyHeaders: Record<string, string> = {};
+  if (body.reply_to_message_id) {
+    const originalMessage = await c.env.DB.prepare(`
+      SELECT * FROM messages WHERE id = ? AND inbox_id = ?
+    `).bind(body.reply_to_message_id, inbox.id).first<{ headers: string; from_address: string }>();
+
+    if (originalMessage?.headers) {
+      const headers = JSON.parse(originalMessage.headers);
+      if (headers['Message-ID']) {
+        replyHeaders['In-Reply-To'] = headers['Message-ID'];
+        replyHeaders['References'] = headers['Message-ID'];
+      }
+    }
+  }
+
   // Send via Resend
   const resend = new Resend(c.env.RESEND_API_KEY);
 
@@ -52,6 +69,7 @@ app.post('/', async (c) => {
       subject: body.subject,
       text: body.text,
       html: body.html,
+      headers: Object.keys(replyHeaders).length > 0 ? replyHeaders : undefined,
     });
 
     if (error) {
