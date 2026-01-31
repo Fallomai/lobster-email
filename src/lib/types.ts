@@ -25,6 +25,7 @@ export interface Inbox {
 export interface Message {
   id: string;
   inbox_id: string;
+  thread_id: string | null;
   direction: 'inbound' | 'outbound';
   from_address: string;
   to_address: string;

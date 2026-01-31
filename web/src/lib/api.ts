@@ -9,6 +9,7 @@ export interface Inbox {
 
 export interface Message {
   id: string;
+  thread_id?: string;
   direction: 'inbound' | 'outbound';
   from: string;
   to: string;
@@ -18,6 +19,27 @@ export interface Message {
   html?: string;
   created_at: string;
   read: boolean;
+}
+
+export interface Thread {
+  thread_id: string;
+  message_count: number;
+  unread_count: number;
+  last_message_at: string;
+  latest_message: {
+    id: string;
+    direction: 'inbound' | 'outbound';
+    from: string;
+    to: string;
+    subject: string;
+    preview: string;
+  } | null;
+}
+
+export interface ThreadsResponse {
+  threads: Thread[];
+  limit: number;
+  offset: number;
 }
 
 export interface SignupResponse {
@@ -90,14 +112,28 @@ class ApiClient {
     limit?: number;
     offset?: number;
     direction?: 'inbound' | 'outbound' | 'all';
+    thread_id?: string;
   }): Promise<MessagesResponse> {
     const params = new URLSearchParams();
     if (options?.limit) params.set('limit', String(options.limit));
     if (options?.offset) params.set('offset', String(options.offset));
     if (options?.direction) params.set('direction', options.direction);
+    if (options?.thread_id) params.set('thread_id', options.thread_id);
 
     const query = params.toString();
     return this.fetch(`/api/messages${query ? `?${query}` : ''}`);
+  }
+
+  async getThreads(options?: {
+    limit?: number;
+    offset?: number;
+  }): Promise<ThreadsResponse> {
+    const params = new URLSearchParams();
+    if (options?.limit) params.set('limit', String(options.limit));
+    if (options?.offset) params.set('offset', String(options.offset));
+
+    const query = params.toString();
+    return this.fetch(`/api/messages/threads${query ? `?${query}` : ''}`);
   }
 
   async getMessage(id: string): Promise<Message> {

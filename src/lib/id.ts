@@ -26,3 +26,7 @@ export function generateMessageId(): string {
 export function generateKeyId(): string {
   return `key_${nanoid(16)}`;
 }
+
+export function generateThreadId(): string {
+  return `thd_${nanoid(16)}`;
+}

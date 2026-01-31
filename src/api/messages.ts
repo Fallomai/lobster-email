@@ -13,9 +13,10 @@ app.get('/', async (c) => {
   const limit = Math.min(parseInt(c.req.query('limit') || '50'), 100);
   const offset = parseInt(c.req.query('offset') || '0');
   const direction = c.req.query('direction') || 'all';
+  const threadId = c.req.query('thread_id');
 
   let query = `
-    SELECT id, direction, from_address, to_address, subject, text_body, created_at, read_at
+    SELECT id, thread_id, direction, from_address, to_address, subject, text_body, created_at, read_at
     FROM messages
     WHERE inbox_id = ?
   `;
@@ -24,6 +25,11 @@ app.get('/', async (c) => {
   if (direction === 'inbound' || direction === 'outbound') {
     query += ` AND direction = ?`;
     params.push(direction);
+  }
+
+  if (threadId) {
+    query += ` AND thread_id = ?`;
+    params.push(threadId);
   }
 
   query += ` ORDER BY created_at DESC LIMIT ? OFFSET ?`;
@@ -40,6 +46,11 @@ app.get('/', async (c) => {
     countParams.push(direction);
   }
 
+  if (threadId) {
+    countQuery += ` AND thread_id = ?`;
+    countParams.push(threadId);
+  }
+
   const countResult = await c.env.DB.prepare(countQuery)
     .bind(...countParams)
     .first<{ count: number }>();
@@ -47,6 +58,7 @@ app.get('/', async (c) => {
   return c.json({
     messages: messages.results.map((m) => ({
       id: m.id,
+      thread_id: m.thread_id,
       direction: m.direction,
       from: m.from_address,
       to: m.to_address,
@@ -85,6 +97,7 @@ app.get('/:id', async (c) => {
 
   return c.json({
     id: message.id,
+    thread_id: message.thread_id,
     direction: message.direction,
     from: message.from_address,
     to: message.to_address,
@@ -96,6 +109,67 @@ app.get('/:id', async (c) => {
     read_at: message.read_at
       ? new Date(message.read_at * 1000).toISOString()
       : null,
+  });
+});
+
+// List threads (grouped conversations)
+app.get('/threads', async (c) => {
+  const { inbox } = c.get('auth');
+
+  const limit = Math.min(parseInt(c.req.query('limit') || '20'), 50);
+  const offset = parseInt(c.req.query('offset') || '0');
+
+  // Get threads with their latest message
+  const threads = await c.env.DB.prepare(`
+    SELECT
+      thread_id,
+      MAX(created_at) as last_message_at,
+      COUNT(*) as message_count,
+      SUM(CASE WHEN read_at IS NULL AND direction = 'inbound' THEN 1 ELSE 0 END) as unread_count
+    FROM messages
+    WHERE inbox_id = ? AND thread_id IS NOT NULL
+    GROUP BY thread_id
+    ORDER BY last_message_at DESC
+    LIMIT ? OFFSET ?
+  `).bind(inbox.id, limit, offset).all<{
+    thread_id: string;
+    last_message_at: number;
+    message_count: number;
+    unread_count: number;
+  }>();
+
+  // Get the latest message for each thread
+  const threadData = await Promise.all(
+    threads.results.map(async (t) => {
+      const latestMessage = await c.env.DB.prepare(`
+        SELECT id, direction, from_address, to_address, subject, text_body, created_at
+        FROM messages
+        WHERE thread_id = ? AND inbox_id = ?
+        ORDER BY created_at DESC
+        LIMIT 1
+      `).bind(t.thread_id, inbox.id).first<Message>();
+
+      return {
+        thread_id: t.thread_id,
+        message_count: t.message_count,
+        unread_count: t.unread_count,
+        last_message_at: new Date(t.last_message_at * 1000).toISOString(),
+        latest_message: latestMessage ? {
+          id: latestMessage.id,
+          direction: latestMessage.direction,
+          from: latestMessage.from_address,
+          to: latestMessage.to_address,
+          subject: latestMessage.subject,
+          preview: latestMessage.text_body?.slice(0, 100) || '',
+        } : null,
+      };
+    })
+  );
+
+  return c.json({
+    threads: threadData,
+    limit,
+    offset,
   });
 });
 

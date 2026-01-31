@@ -1,8 +1,8 @@
 import { Hono } from 'hono';
 import { Resend } from 'resend';
-import { Env } from '../lib/types';
+import { Env, Message } from '../lib/types';
 import { authMiddleware } from './auth';
-import { generateMessageId } from '../lib/id';
+import { generateMessageId, generateThreadId } from '../lib/id';
 
 const app = new Hono<{ Bindings: Env }>();
 
@@ -43,20 +43,31 @@ app.post('/', async (c) => {
     }, 429);
   }
 
-  // If replying, fetch original message to get headers
+  // If replying, fetch original message to get headers and thread_id
   let replyHeaders: Record<string, string> = {};
+  let threadId: string | null = null;
+
   if (body.reply_to_message_id) {
     const originalMessage = await c.env.DB.prepare(`
       SELECT * FROM messages WHERE id = ? AND inbox_id = ?
-    `).bind(body.reply_to_message_id, inbox.id).first<{ headers: string; from_address: string }>();
+    `).bind(body.reply_to_message_id, inbox.id).first<Message>();
 
-    if (originalMessage?.headers) {
-      const headers = JSON.parse(originalMessage.headers);
-      if (headers['Message-ID']) {
-        replyHeaders['In-Reply-To'] = headers['Message-ID'];
-        replyHeaders['References'] = headers['Message-ID'];
+    if (originalMessage) {
+      threadId = originalMessage.thread_id;
+
+      if (originalMessage.headers) {
+        const headers = JSON.parse(originalMessage.headers);
+        if (headers['Message-ID']) {
+          replyHeaders['In-Reply-To'] = headers['Message-ID'];
+          replyHeaders['References'] = headers['Message-ID'];
+        }
       }
     }
+  }
+
+  // If no thread from reply, create a new thread
+  if (!threadId) {
+    threadId = generateThreadId();
   }
 
   // Send via Resend
@@ -82,11 +93,12 @@ app.post('/', async (c) => {
     const now = Math.floor(Date.now() / 1000);
 
     await c.env.DB.prepare(`
-      INSERT INTO messages (id, inbox_id, direction, from_address, to_address, subject, text_body, html_body, created_at)
-      VALUES (?, ?, 'outbound', ?, ?, ?, ?, ?, ?)
+      INSERT INTO messages (id, inbox_id, thread_id, direction, from_address, to_address, subject, text_body, html_body, created_at)
+      VALUES (?, ?, ?, 'outbound', ?, ?, ?, ?, ?, ?)
     `).bind(
       messageId,
       inbox.id,
+      threadId,
       inbox.email,
       body.to,
       body.subject,

@@ -23,6 +23,7 @@ CREATE TABLE IF NOT EXISTS inboxes (
 CREATE TABLE IF NOT EXISTS messages (
   id TEXT PRIMARY KEY,
   inbox_id TEXT NOT NULL,
+  thread_id TEXT,
   direction TEXT NOT NULL,
   from_address TEXT NOT NULL,
   to_address TEXT NOT NULL,
@@ -37,5 +38,6 @@ CREATE TABLE IF NOT EXISTS messages (
 
 -- Indexes
 CREATE INDEX IF NOT EXISTS idx_messages_inbox_created ON messages(inbox_id, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_messages_thread ON messages(thread_id, created_at ASC);
 CREATE INDEX IF NOT EXISTS idx_inboxes_email ON inboxes(email);
 CREATE INDEX IF NOT EXISTS idx_api_keys_hash ON api_keys(key_hash);
