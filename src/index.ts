@@ -16,7 +16,7 @@ const app = new Hono<{ Bindings: Env }>();
 
 // CORS for all routes - allow frontend to call API
 app.use('*', cors({
-  origin: ['https://lobster.email', 'http://localhost:5173', 'http://localhost:3000'],
+  origin: ['https://lobster.email', 'https://www.lobster.email', 'http://localhost:5173', 'http://localhost:3000'],
   allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowHeaders: ['Content-Type', 'Authorization'],
   credentials: true,
