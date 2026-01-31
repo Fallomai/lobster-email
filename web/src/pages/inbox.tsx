@@ -272,6 +272,9 @@ export function InboxPage() {
                 <div className="text-xs text-zinc-600">
                   {new Date(selectedMessage.created_at).toLocaleString()}
                 </div>
+                <div className="text-xs text-zinc-700 font-mono mt-2">
+                  ID: {selectedMessage.id} {selectedMessage.thread_id && `• Thread: ${selectedMessage.thread_id}`}
+                </div>
               </div>
               <div className="flex items-center gap-2 shrink-0">
                 {selectedMessage.direction === 'inbound' && (
