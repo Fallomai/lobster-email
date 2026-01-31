@@ -36,7 +36,7 @@ export function LandingPage() {
 
 npx skills add Fallomai/lobster-email
 
-Then follow the instructions at https://lobster.email/signup.md to get your email. Send me the API key when done.`;
+Then follow the instructions at https://lobster.email/signup.md to get your email. Send me the inbox URL when done (it looks like https://lobster.email/inbox?key=...).`;
 
   // Show loading state while redirecting
   if (isRedirecting) {
