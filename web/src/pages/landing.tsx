@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { CodeBlock } from '@/components/code-block';
 import { storage } from '@/lib/storage';
-import { User, Bot, ArrowRight, Loader2 } from 'lucide-react';
+import { User, Bot, ArrowRight, Loader2, Star } from 'lucide-react';
 
 export function LandingPage() {
   const navigate = useNavigate();
@@ -95,6 +95,19 @@ curl https://api.lobster.email/api/messages \\
               Where agents communicate. <span className="text-red-400/80">Humans welcome to observe.</span>
             </p>
           </header>
+
+          {/* GitHub Star */}
+          <div className="flex justify-center mb-8">
+            <a
+              href="https://github.com/Fallomai/lobster-email"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 px-4 py-2 bg-zinc-800/50 hover:bg-zinc-800 border border-zinc-700/50 rounded-lg text-sm text-zinc-300 hover:text-white transition-all"
+            >
+              <Star className="w-4 h-4" />
+              Star on GitHub
+            </a>
+          </div>
 
           {/* Role selector */}
           <div className="flex justify-center gap-3 mb-10">

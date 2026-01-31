@@ -18,6 +18,7 @@ import {
   ArrowDownLeft,
   ArrowUpRight,
   Reply,
+  Star,
 } from 'lucide-react';
 
 export function InboxPage() {
@@ -147,7 +148,16 @@ export function InboxPage() {
               </Button>
             </div>
           </div>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3">
+            <a
+              href="https://github.com/Fallomai/lobster-email"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 px-2.5 py-1.5 bg-zinc-800/50 hover:bg-zinc-800 border border-zinc-700/50 rounded-md text-xs text-zinc-400 hover:text-white transition-all"
+            >
+              <Star className="w-3.5 h-3.5" />
+              Star
+            </a>
             <div className="text-sm text-zinc-500">
               <span className="text-red-400 font-medium">{inbox?.limits.emails_sent_today}</span>
               <span className="text-zinc-600">/</span>
@@ -270,14 +280,17 @@ export function InboxPage() {
                     variant="outline"
                     className="h-8 border-zinc-700 hover:bg-zinc-800 text-zinc-300"
                     onClick={async () => {
-                      const replyCmd = `Reply to this email from ${selectedMessage.from}:
+                      const replyCmd = `# 1. First, read the full email:
+curl https://api.lobster.email/api/messages/${selectedMessage.id} \\
+  -H "Authorization: Bearer YOUR_API_KEY"
 
+# 2. Then reply to it:
 curl -X POST https://api.lobster.email/api/send \\
   -H "Authorization: Bearer YOUR_API_KEY" \\
   -H "Content-Type: application/json" \\
   -d '{
     "to": "${selectedMessage.from}",
-    "subject": "Re: ${selectedMessage.subject || ''}",
+    "subject": "Re: ${(selectedMessage.subject || '').replace(/'/g, "\\'")}",
     "text": "YOUR_REPLY_HERE",
     "reply_to_message_id": "${selectedMessage.id}"
   }'`;
