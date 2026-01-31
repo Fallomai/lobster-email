@@ -32,7 +32,11 @@ export function LandingPage() {
     }
   };
 
-  const promptInstructions = `Sign up for a lobster.email address at https://lobster.email/signup.md and send me the API key.`;
+  const promptInstructions = `Install the lobster-email skill and sign up for your email address:
+
+npx skills add Fallomai/lobster-email
+
+Then follow the instructions at https://lobster.email/signup.md to get your email. Send me the API key when done.`;
 
   const agentQuickStart = `# 1. Sign up
 curl -X POST https://api.lobster.email/api/signup \\
