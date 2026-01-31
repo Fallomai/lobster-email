@@ -19,7 +19,7 @@ export const landingPage = `<!DOCTYPE html>
     }
 
     .container {
-      max-width: 600px;
+      max-width: 700px;
       width: 100%;
     }
 
@@ -74,11 +74,12 @@ export const landingPage = `<!DOCTYPE html>
       border: 1px solid #444;
       border-radius: 4px;
       padding: 1rem;
-      font-family: monospace;
-      font-size: 0.9rem;
+      font-family: 'SF Mono', 'Fira Code', monospace;
+      font-size: 0.85rem;
       color: #4ade80;
       position: relative;
-      word-break: break-all;
+      overflow-x: auto;
+      white-space: pre;
     }
 
     .copy-btn {
@@ -96,6 +97,46 @@ export const landingPage = `<!DOCTYPE html>
 
     .copy-btn:hover {
       background: #444;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 0;
+      margin-bottom: 0;
+    }
+
+    .tab {
+      background: #1a1a1a;
+      border: 1px solid #333;
+      border-bottom: none;
+      color: #666;
+      padding: 0.5rem 1rem;
+      cursor: pointer;
+      font-size: 0.8rem;
+      border-radius: 4px 4px 0 0;
+      margin-right: -1px;
+    }
+
+    .tab.active {
+      background: #0d0d0d;
+      color: #4ade80;
+      border-color: #444;
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    .comment {
+      color: #666;
+    }
+
+    .string {
+      color: #fbbf24;
     }
 
     .steps {
@@ -175,6 +216,26 @@ export const landingPage = `<!DOCTYPE html>
     .footer a:hover {
       text-decoration: underline;
     }
+
+    .response-box {
+      background: #0d0d0d;
+      border: 1px solid #333;
+      border-top: none;
+      border-radius: 0 0 4px 4px;
+      padding: 1rem;
+      font-family: 'SF Mono', 'Fira Code', monospace;
+      font-size: 0.8rem;
+      color: #888;
+      margin-top: 0;
+    }
+
+    .response-box .key {
+      color: #ff6b6b;
+    }
+
+    .response-box .value {
+      color: #4ade80;
+    }
   </style>
 </head>
 <body>
@@ -186,14 +247,40 @@ export const landingPage = `<!DOCTYPE html>
     </header>
 
     <div class="instruction-box">
-      <h2>Tell your agent</h2>
-      <div class="copy-box">
-        <button class="copy-btn" onclick="copyInstructions()">Copy</button>
-        Read https://lobster.email/signup.md and follow the instructions to get your email address.
+      <h2>Get your agent an email</h2>
+
+      <div class="tabs">
+        <button class="tab active" onclick="showTab('curl')">curl</button>
+        <button class="tab" onclick="showTab('prompt')">prompt</button>
       </div>
+
+      <div id="curl-tab" class="tab-content active">
+        <div class="copy-box">
+          <button class="copy-btn" onclick="copyCurl()">Copy</button>
+<span class="comment"># Sign up</span>
+curl -X POST https://lobster.email/api/signup \\
+  -H <span class="string">"Content-Type: application/json"</span> \\
+  -d <span class="string">'{"name": "my-agent"}'</span></div>
+        <div class="response-box">
+<span class="comment"># Response</span>
+{
+  <span class="key">"api_key"</span>: <span class="value">"lob_xxxxxxxxxxxxxxxx"</span>,
+  <span class="key">"inbox"</span>: {
+    <span class="key">"id"</span>: <span class="value">"my-agent-x7k2"</span>,
+    <span class="key">"email"</span>: <span class="value">"my-agent-x7k2@lobster.email"</span>
+  }
+}</div>
+      </div>
+
+      <div id="prompt-tab" class="tab-content">
+        <div class="copy-box">
+          <button class="copy-btn" onclick="copyPrompt()">Copy</button>
+Read https://lobster.email/signup.md and follow the instructions to get your email address.</div>
+      </div>
+
       <ol class="steps">
-        <li>Send this to your agent</li>
-        <li>They sign up & give you your API key</li>
+        <li>Your agent signs up via API</li>
+        <li>They get an email address + API key</li>
         <li>Paste your key below to view your inbox</li>
       </ol>
     </div>
@@ -215,15 +302,32 @@ export const landingPage = `<!DOCTYPE html>
     </div>
 
     <footer class="footer">
-      <p><a href="/signup.md">API Docs</a></p>
+      <p><a href="/signup.md">API Docs</a> · <a href="https://github.com/openclaw-ai/lobster-email">GitHub</a></p>
     </footer>
   </div>
 
   <script>
-    function copyInstructions() {
+    function showTab(tab) {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+      document.querySelector(\`.tab[onclick="showTab('\${tab}')"]\`).classList.add('active');
+      document.getElementById(tab + '-tab').classList.add('active');
+    }
+
+    function copyCurl() {
+      const text = \`curl -X POST https://lobster.email/api/signup \\\\
+  -H "Content-Type: application/json" \\\\
+  -d '{"name": "my-agent"}'\`;
+      navigator.clipboard.writeText(text);
+      const btn = document.querySelector('#curl-tab .copy-btn');
+      btn.textContent = 'Copied!';
+      setTimeout(() => btn.textContent = 'Copy', 2000);
+    }
+
+    function copyPrompt() {
       const text = 'Read https://lobster.email/signup.md and follow the instructions to get your email address.';
       navigator.clipboard.writeText(text);
-      const btn = document.querySelector('.copy-btn');
+      const btn = document.querySelector('#prompt-tab .copy-btn');
       btn.textContent = 'Copied!';
       setTimeout(() => btn.textContent = 'Copy', 2000);
     }
