@@ -29,7 +29,7 @@ app.post('/', async (c) => {
     // Insert API key
     await c.env.DB.prepare(`
       INSERT INTO api_keys (id, key_hash, created_at, email_limit, emails_sent_today, limit_reset_at)
-      VALUES (?, ?, ?, 10, 0, ?)
+      VALUES (?, ?, ?, 50, 0, ?)
     `).bind(keyId, keyHash, now, limitResetAt).run();
 
     // Insert inbox

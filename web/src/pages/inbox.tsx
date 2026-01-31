@@ -15,6 +15,9 @@ import {
   LogOut,
   RefreshCw,
   Loader2,
+  ArrowDownLeft,
+  ArrowUpRight,
+  Reply,
 } from 'lucide-react';
 
 export function InboxPage() {
@@ -30,6 +33,7 @@ export function InboxPage() {
   const [direction, setDirection] = useState<'all' | 'inbound' | 'outbound'>('all');
   const [selectedMessage, setSelectedMessage] = useState<Message | null>(null);
   const [copied, setCopied] = useState(false);
+  const [copiedReply, setCopiedReply] = useState(false);
 
   const fetchData = useCallback(async (showRefresh = false) => {
     if (!apiKey) {
@@ -214,9 +218,16 @@ export function InboxPage() {
                 onClick={() => handleOpenMessage(msg)}
               >
                 <div className="flex items-center justify-between mb-1.5">
-                  <span className={`text-sm ${!msg.read ? 'font-semibold text-zinc-100' : 'font-medium text-zinc-300'}`}>
-                    {msg.direction === 'inbound' ? msg.from : msg.to}
-                  </span>
+                  <div className="flex items-center gap-2">
+                    {msg.direction === 'inbound' ? (
+                      <ArrowDownLeft className="h-3.5 w-3.5 text-emerald-500" />
+                    ) : (
+                      <ArrowUpRight className="h-3.5 w-3.5 text-blue-500" />
+                    )}
+                    <span className={`text-sm ${!msg.read ? 'font-semibold text-zinc-100' : 'font-medium text-zinc-300'}`}>
+                      {msg.direction === 'inbound' ? msg.from : msg.to}
+                    </span>
+                  </div>
                   <span className="text-xs text-zinc-600">{timeAgo(msg.created_at)}</span>
                 </div>
                 <div className={`text-sm truncate ${!msg.read ? 'text-zinc-300' : 'text-zinc-400'}`}>
@@ -252,14 +263,46 @@ export function InboxPage() {
                   {new Date(selectedMessage.created_at).toLocaleString()}
                 </div>
               </div>
-              <Button
-                size="sm"
-                variant="ghost"
-                className="h-8 w-8 p-0 hover:bg-zinc-800 text-zinc-500 shrink-0"
-                onClick={() => setSelectedMessage(null)}
-              >
-                <X className="h-4 w-4" />
-              </Button>
+              <div className="flex items-center gap-2 shrink-0">
+                {selectedMessage.direction === 'inbound' && (
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="h-8 border-zinc-700 hover:bg-zinc-800 text-zinc-300"
+                    onClick={async () => {
+                      const replyCmd = `Reply to this email from ${selectedMessage.from}:
+
+curl -X POST https://api.lobster.email/api/send \\
+  -H "Authorization: Bearer YOUR_API_KEY" \\
+  -H "Content-Type: application/json" \\
+  -d '{
+    "to": "${selectedMessage.from}",
+    "subject": "Re: ${selectedMessage.subject || ''}",
+    "text": "YOUR_REPLY_HERE",
+    "reply_to_message_id": "${selectedMessage.id}"
+  }'`;
+                      await copyToClipboard(replyCmd);
+                      setCopiedReply(true);
+                      setTimeout(() => setCopiedReply(false), 2000);
+                    }}
+                  >
+                    {copiedReply ? (
+                      <Check className="h-3.5 w-3.5 mr-1.5 text-emerald-400" />
+                    ) : (
+                      <Reply className="h-3.5 w-3.5 mr-1.5" />
+                    )}
+                    {copiedReply ? 'Copied!' : 'Copy Reply'}
+                  </Button>
+                )}
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  className="h-8 w-8 p-0 hover:bg-zinc-800 text-zinc-500"
+                  onClick={() => setSelectedMessage(null)}
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
             </div>
 
             {/* Subject */}
