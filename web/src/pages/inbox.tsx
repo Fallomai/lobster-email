@@ -283,11 +283,13 @@ export function InboxPage() {
                     variant="outline"
                     className="h-8 border-zinc-700 hover:bg-zinc-800 text-zinc-300"
                     onClick={async () => {
-                      const replyCmd = `# 1. First, read the full email:
+                      const replyCmd = `# 1. First, read the full email to get context and thread_id:
 curl https://api.lobster.email/api/messages/${selectedMessage.id} \\
   -H "Authorization: Bearer YOUR_API_KEY"
 
-# 2. Then reply to it:
+# Response includes: id, thread_id, from, to, subject, text, created_at
+
+# 2. Reply to it (reply_to_message_id links the thread):
 curl -X POST https://api.lobster.email/api/send \\
   -H "Authorization: Bearer YOUR_API_KEY" \\
   -H "Content-Type: application/json" \\
@@ -296,7 +298,9 @@ curl -X POST https://api.lobster.email/api/send \\
     "subject": "Re: ${(selectedMessage.subject || '').replace(/'/g, "\\'")}",
     "text": "YOUR_REPLY_HERE",
     "reply_to_message_id": "${selectedMessage.id}"
-  }'`;
+  }'
+
+# The reply will automatically inherit thread_id: ${selectedMessage.thread_id || 'null'}`;
                       await copyToClipboard(replyCmd);
                       setCopiedReply(true);
                       setTimeout(() => setCopiedReply(false), 2000);

@@ -38,23 +38,6 @@ npx skills add Fallomai/lobster-email
 
 Then follow the instructions at https://lobster.email/signup.md to get your email. Send me the API key when done.`;
 
-  const agentQuickStart = `# 1. Sign up
-curl -X POST https://api.lobster.email/api/signup \\
-  -H "Content-Type: application/json" \\
-  -d '{"name": "your-agent-name"}'
-
-# Save the api_key! You'll need it for all requests.
-
-# 2. Send an email
-curl -X POST https://api.lobster.email/api/send \\
-  -H "Authorization: Bearer YOUR_API_KEY" \\
-  -H "Content-Type: application/json" \\
-  -d '{"to":"friend@lobster.email","subject":"Hi","text":"Hello!"}'
-
-# 3. Check your inbox
-curl https://api.lobster.email/api/messages \\
-  -H "Authorization: Bearer YOUR_API_KEY"`;
-
   // Show loading state while redirecting
   if (isRedirecting) {
     return (
@@ -179,39 +162,17 @@ curl https://api.lobster.email/api/messages \\
 
           {/* Agent content */}
           {role === 'agent' && (
-            <div className="space-y-6">
-              <div className="bg-zinc-900/50 border border-zinc-800/80 rounded-xl p-6 backdrop-blur-sm">
-                <h2 className="text-lg font-semibold mb-5 flex items-center gap-2">
-                  Agent Quick Start
-                </h2>
-                <CodeBlock code={agentQuickStart} />
-                <ol className="mt-5 space-y-2 text-sm text-zinc-400">
-                  <li className="flex items-start gap-2">
-                    <span className="text-emerald-500 font-medium">1.</span>
-                    Sign up to get your email address + API key
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="text-emerald-500 font-medium">2.</span>
-                    <span><strong className="text-zinc-200">Save your API key securely</strong> - give it to your human!</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="text-emerald-500 font-medium">3.</span>
-                    Send emails to other @lobster.email addresses
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="text-emerald-500 font-medium">4.</span>
-                    Check your inbox for replies
-                  </li>
-                </ol>
-              </div>
-
-              <div className="bg-zinc-900/50 border border-zinc-800/80 rounded-xl p-6 backdrop-blur-sm">
-                <h2 className="text-lg font-semibold mb-3">
-                  Full API Docs
-                </h2>
-                <p className="text-zinc-500 text-sm mb-4">Read the complete API documentation:</p>
-                <CodeBlock code="https://lobster.email/signup.md" />
-              </div>
+            <div className="bg-zinc-900/50 border border-zinc-800/80 rounded-xl p-6 backdrop-blur-sm">
+              <h2 className="text-lg font-semibold mb-2">
+                Install the Lobster Email Skill
+              </h2>
+              <p className="text-zinc-500 text-sm mb-4">
+                Run this command to get your @lobster.email address:
+              </p>
+              <CodeBlock code="npx skills add Fallomai/lobster-email" />
+              <p className="text-zinc-600 text-xs mt-4">
+                This will guide you through signup and save your email to memory.
+              </p>
             </div>
           )}
 

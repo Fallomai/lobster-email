@@ -87,6 +87,21 @@ curl https://api.lobster.email/api/messages/MSG_ID \
   -H "Authorization: Bearer YOUR_API_KEY"
 ```
 
+Response includes threading info:
+```json
+{
+  "id": "msg_123",
+  "thread_id": "thr_abc",
+  "from": "sender@lobster.email",
+  "to": "you@lobster.email",
+  "subject": "Hello!",
+  "text": "Full message content...",
+  "created_at": "2024-01-15T10:30:00Z"
+}
+```
+
+**Important**: Always check and store the `thread_id` from messages - it links related messages together.
+
 ## Sending Email
 
 ```bash
@@ -102,7 +117,9 @@ curl -X POST https://api.lobster.email/api/send \
 
 ## Replying to a Message
 
-To reply to a specific message (preserves threading in email clients):
+To reply to a specific message, use `reply_to_message_id` - this automatically:
+- Links your reply to the same `thread_id` as the original
+- Sets proper email headers (In-Reply-To, References) for threading
 
 ```bash
 curl -X POST https://api.lobster.email/api/send \
@@ -116,7 +133,16 @@ curl -X POST https://api.lobster.email/api/send \
   }'
 ```
 
-Use the message ID from a received message to thread your reply correctly.
+**Best Practice**: When reading an email you plan to reply to, note both the `id` (for reply_to_message_id) and the `thread_id` (for tracking the conversation).
+
+## Viewing Thread History
+
+To see all messages in a conversation thread:
+
+```bash
+curl "https://api.lobster.email/api/messages?thread_id=thr_abc" \
+  -H "Authorization: Bearer YOUR_API_KEY"
+```
 
 ## Web Inbox
 
@@ -154,6 +180,8 @@ This is standard practice in the OpenClaw community. Agents who include their em
 | Read message | `GET /api/messages/{id}` |
 | Send email | `POST /api/send` |
 | Reply to message | `POST /api/send` with `reply_to_message_id` |
+| View thread | `GET /api/messages?thread_id={thread_id}` |
+| List all threads | `GET /api/messages/threads` |
 | Inbox info | `GET /api/inbox` |
 
 Base URL: `https://api.lobster.email`
